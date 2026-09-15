@@ -1,5 +1,5 @@
-from datasets import load_dataset, Dataset
-from typing import Any,cast
+# pyright: reportMissingTypeStubs=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnknownMemberType=false
+from datasets import Dataset, load_dataset
 
 from router.categories import true_category
 from router.schema import Category
@@ -7,33 +7,31 @@ from router.schema import Category
 TEXT_COL = "utterance"
 LABEL_COL = "label"
 
-""" print(ds)                    # splits + features
-print(ds.features)           # {'utterance': Value('string'), 'label': Value('int64')}
-print(ds[0])                 # one row
-print(ds.num_rows, "rows")
 
-print(intents[0])            # {'id': 0, 'name': '...', ...}
- """
 def _id_to_name() -> dict[int, str]:
     intents = load_dataset("DeepPavlov/clinc150", "intents", split="intents")
-    return dict(zip(intents["id"], intents["name"]))
+    assert isinstance(intents, Dataset)
+    ids: list[int] = list(intents["id"])
+    names: list[str] = list(intents["name"])
+    return {int(i): str(n) for i, n in zip(ids, names)}
 
-def load_tasks(n: int, include_other: bool = False) -> list[tuple[str,Category]]:
-  id_to_name = _id_to_name()
-  ds = load_dataset("DeepPavlov/clinic150", split="test").shuffle(seed=42)
-  out: list[tuple[str,Category]] = []
-  for row in ds:
-    row = cast(dict[str,Any],row)
-    intent = id_to_name[row[LABEL_COL]]
-    cat=true_category(intent)
-    if cat is Category.other and not include_other:
-      continue
-    out.append((row[TEXT_COL],cat))
-    if len(out) >= n:
-      break;
+def load_tasks(n: int, include_other: bool = False) -> list[tuple[str, Category]]:
+    id_to_name = _id_to_name()
+    ds = load_dataset("DeepPavlov/clinc150", split="test").shuffle(seed=42)
+    assert isinstance(ds, Dataset)
 
-  return out;
+    texts: list[str] = list(ds[TEXT_COL])      # column access → list, well-typed
+    labels: list[int] = list(ds[LABEL_COL])
 
-    
+    out: list[tuple[str, Category]] = []
+    for text, label in zip(texts, labels):
+        cat = true_category(id_to_name[int(label)])
+        if cat is Category.other and not include_other:
+            continue
+        out.append((str(text), cat))
+        if len(out) >= n:
+            break
+    return out
+
 
 __all__ = ["load_tasks"]

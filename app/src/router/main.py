@@ -26,9 +26,14 @@ def classify_one(body: ClassifyBody) -> Classification:
     return classify(body.task)
 
 
+
 @app.post("/run", response_model=RunSummary, tags=["classify"])
 def run(n: int = 50, include_other: bool = False) -> RunSummary:
-    """Batch-classify labeled tasks and score against ground truth."""
+    """
+        Batch-classify labeled tasks and score against ground truth.
+        We using this endpoint to try to evaluate if the system prompt 
+        is efficient or not
+    """
     tasks = load_tasks(n, include_other=include_other)
     results: list[TaskResult] = []
     correct = 0

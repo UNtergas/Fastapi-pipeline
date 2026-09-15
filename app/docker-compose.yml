@@ -1,0 +1,26 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_HOME=/hf_cache                 # cache CLINC downloads in a volume
+    volumes:
+      - .:/app                            # hot reload
+      - /app/.venv                        # preserve the container's Linux venv (critical)
+      - hf_cache:/hf_cache                # dataset cache persists across restarts
+    command: uvicorn router.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  hf_cache:

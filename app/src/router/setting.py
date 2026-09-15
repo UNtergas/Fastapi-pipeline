@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     )
 
     # default value, to be overwritten in .env
-    ollama_url: str = "http://localhost:11434"
+    ollama_url: str = "http://ollama:11434"
  
     # default value, to be overwritten in .env
     ollama_model: str = "qwen3:8b"
