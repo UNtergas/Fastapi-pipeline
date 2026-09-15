@@ -32,6 +32,7 @@ def classify(task: str) -> Classification:
             },
         ],
         format=Classification.model_json_schema(),
+        think=False
     )
 
     # Fallback to pre-defined parse if ollama failed to apply model_json_schema
