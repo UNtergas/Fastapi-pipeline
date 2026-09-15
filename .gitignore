@@ -1,0 +1,23 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# n8n writes these at runtime — keep the input CSV, ignore generated outputs
+fixtures/home/
+fixtures/events/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
